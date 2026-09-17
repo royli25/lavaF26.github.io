@@ -6,7 +6,7 @@ export function Icon({ name, className = '' }: { name: string; className?: strin
   return <img className={`icon ${className}`} src={`${import.meta.env.BASE_URL}assets/${name}.svg`} alt="" width="18" height="18" draggable="false" />
 }
 
-type PanelTitleIcon = 'soft-search' | 'soft-layers' | 'focus-pebble' | 'friendly-rivals' | 'live-pulse'
+type PanelTitleIcon = 'soft-search' | 'soft-layers' | 'focus-pebble' | 'friendly-rivals' | 'live-pulse' | 'missing-search'
 
 export function Panel({ title, titleIcon, action, children, className = '', id }: { title: string; titleIcon?: PanelTitleIcon; action?: ReactNode; children: ReactNode; className?: string; id?: string }) {
   return <Card id={id} className={`panel ${className}`} role="region" aria-label={title}><CardHeader className="panel-heading"><CardTitle><h2 className="panel-title">{titleIcon && <Icon name={`card-icons/${titleIcon}`} className="panel-title-icon" />}{title}</h2></CardTitle>{action}</CardHeader>{children}</Card>

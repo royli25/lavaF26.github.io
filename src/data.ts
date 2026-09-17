@@ -1,13 +1,22 @@
-export type Page = 'Overview' | 'Appearance' | 'Search activity' | 'Opportunities' | 'Competitors' | 'Reports' | 'Settings'
+// Sample appearance totals from the approved Figma card (183:57238).
+export const campusBrands = [
+  { name: 'SparkSC', logo: 'sparksc', appearances: 12480 },
+  { name: 'Sigma Eta Pi', logo: 'sigma-eta-pi', appearances: 9620 },
+  { name: 'LavaLab', logo: 'lavalab', appearances: 8500 },
+  { name: 'TroyLabs', logo: 'troylabs', appearances: 7840 },
+  { name: 'VC Academy', logo: 'vc-academy', appearances: 6210 },
+]
+
+export type Page = 'Overview' | 'Performance' | 'Search activity' | 'Opportunities' | 'Competitors' | 'Reports' | 'Settings'
 export const comingSoonPages: readonly Page[] = ['Search activity', 'Opportunities', 'Competitors', 'Reports']
 
 export type Period = '7' | '28' | '90'
 export type Model = 'ChatGPT' | 'Perplexity' | 'Gemini' | 'Claude' | 'DeepSeek' | 'Grok' | 'Copilot' | 'Meta AI' | 'Mistral' | 'Qwen'
-export type Query = { id: string; text: string; models: Model[]; rate: number | null; losingTo?: 'Linear' | 'Notion' | 'Monday' | 'Mailchimp' | 'Semrush' | 'Buffer' | 'Webflow' }
+export type Query = { id: string; text: string; models: Model[]; rate: number | null; losingTo?: 'SparkSC' | 'Sigma Eta Pi' | 'TroyLabs' | 'VC Academy' }
 
 export const navigation: { name: Page; icon: string }[] = [
   { name: 'Overview', icon: 'imgIconHome' },
-  { name: 'Appearance', icon: 'imgIconChart' },
+  { name: 'Performance', icon: 'imgIconChart' },
   { name: 'Search activity', icon: 'imgIconActivity' },
   { name: 'Opportunities', icon: 'imgIconSpark1' },
   { name: 'Competitors', icon: 'imgIconUsers' },
@@ -47,16 +56,16 @@ export const appearanceModels = [...models,
 ]
 
 export const appearanceQueries: Query[] = [
-  { id: 'ai-visibility', losingTo: 'Semrush', text: 'Best AI visibility tools', rate: 92, models: appearanceModels.map(m => m.name) },
-  { id: 'brand-mentions', losingTo: 'Semrush', text: 'How to track brand mentions', rate: 86, models: appearanceModels.map(m => m.name) },
-  { id: 'ai-analytics', losingTo: 'Semrush', text: 'AI search analytics platforms', rate: 80, models: appearanceModels.map(m => m.name) },
-  { id: 'chatgpt-visibility', losingTo: 'Semrush', text: 'Improve visibility in ChatGPT', rate: 74, models: appearanceModels.map(m => m.name) },
-  { id: 'search-roi', losingTo: 'Semrush', text: 'Measure generative search ROI', rate: 68, models: appearanceModels.map(m => m.name) },
-  { id: 'seo-templates', losingTo: 'Semrush', text: 'Free SEO reporting templates', rate: 3.8, models: appearanceModels.map(m => m.name) },
-  { id: 'social-tools', losingTo: 'Buffer', text: 'Social media scheduling tools', rate: 9.2, models: appearanceModels.map(m => m.name) },
-  { id: 'email-tools', losingTo: 'Mailchimp', text: 'Best email marketing software', rate: 2.4, models: appearanceModels.map(m => m.name) },
-  { id: 'landing-page', losingTo: 'Webflow', text: 'How to build a landing page', rate: 16, models: appearanceModels.map(m => m.name) },
-  { id: 'traffic-benchmarks', losingTo: 'Semrush', text: 'Website traffic benchmarks', rate: 4.9, models: appearanceModels.map(m => m.name) },
+  { id: 'ai-visibility', losingTo: 'SparkSC', text: 'Best AI visibility tools', rate: 92, models: appearanceModels.map(m => m.name) },
+  { id: 'brand-mentions', losingTo: 'SparkSC', text: 'How to track brand mentions', rate: 86, models: appearanceModels.map(m => m.name) },
+  { id: 'ai-analytics', losingTo: 'SparkSC', text: 'AI search analytics platforms', rate: 80, models: appearanceModels.map(m => m.name) },
+  { id: 'chatgpt-visibility', losingTo: 'SparkSC', text: 'Improve visibility in ChatGPT', rate: 74, models: appearanceModels.map(m => m.name) },
+  { id: 'search-roi', losingTo: 'SparkSC', text: 'Measure generative search ROI', rate: 68, models: appearanceModels.map(m => m.name) },
+  { id: 'seo-templates', losingTo: 'SparkSC', text: 'Free SEO reporting templates', rate: 3.8, models: appearanceModels.map(m => m.name) },
+  { id: 'social-tools', losingTo: 'TroyLabs', text: 'Social media scheduling tools', rate: 9.2, models: appearanceModels.map(m => m.name) },
+  { id: 'email-tools', losingTo: 'Sigma Eta Pi', text: 'Best email marketing software', rate: 2.4, models: appearanceModels.map(m => m.name) },
+  { id: 'landing-page', losingTo: 'VC Academy', text: 'How to build a landing page', rate: 16, models: appearanceModels.map(m => m.name) },
+  { id: 'traffic-benchmarks', losingTo: 'SparkSC', text: 'Website traffic benchmarks', rate: 4.9, models: appearanceModels.map(m => m.name) },
 ]
 
 export const competitors = [
@@ -67,11 +76,11 @@ export const competitors = [
 ]
 
 export const initialQueries: Query[] = [
-  { id: 'startup', losingTo: 'Linear', text: 'Best project management tool for startups', models: appearanceModels.map(m => m.name), rate: 12 },
-  { id: 'linear', losingTo: 'Notion', text: 'Linear alternatives for small teams', models: appearanceModels.map(m => m.name), rate: 18 },
-  { id: 'launch', losingTo: 'Monday', text: 'How to manage a product launch', models: appearanceModels.map(m => m.name), rate: 24 },
-  { id: 'planning', losingTo: 'Monday', text: 'Affordable team planning software', models: appearanceModels.map(m => m.name), rate: 31 },
-  { id: 'async', losingTo: 'Notion', text: 'Best async collaboration tools', models: appearanceModels.map(m => m.name), rate: 36 },
+  { id: 'startup', losingTo: 'SparkSC', text: 'Best project management tool for startups', models: appearanceModels.map(m => m.name), rate: 12 },
+  { id: 'linear', losingTo: 'Sigma Eta Pi', text: 'Linear alternatives for small teams', models: appearanceModels.map(m => m.name), rate: 18 },
+  { id: 'launch', losingTo: 'TroyLabs', text: 'How to manage a product launch', models: appearanceModels.map(m => m.name), rate: 24 },
+  { id: 'planning', losingTo: 'TroyLabs', text: 'Affordable team planning software', models: appearanceModels.map(m => m.name), rate: 31 },
+  { id: 'async', losingTo: 'Sigma Eta Pi', text: 'Best async collaboration tools', models: appearanceModels.map(m => m.name), rate: 36 },
 ]
 
 export const activities = [
@@ -86,6 +95,8 @@ export const opportunities = [
   { id: 'comparison', title: 'Own the startup comparison', impact: 'High impact', count: '8 queries', description: 'Acme is missing from eight high-intent comparison answers that mention your competitors.', action: 'Publish a comparison page covering startup use cases, pricing, and integrations. Give each claim a specific example.', queries: ['Best project management tool for startups', 'Linear alternatives for small teams'] },
   { id: 'pricing', title: 'Refresh your pricing page', impact: 'Quick win', count: '4 answers', description: 'Four sampled answers still cite an older Acme plan.', action: 'Update your pricing page with current plans, clear feature comparisons, and a visible last-updated date.', queries: ['Affordable team planning software', 'Acme pricing for small teams'] },
   { id: 'launch', title: 'Build on your launch guide', impact: 'High impact', count: '3 queries', description: 'Your launch guide is being cited, but related planning queries still favor competitors.', action: 'Expand the guide with a launch checklist, an example timeline, and links to your planning features.', queries: ['How to manage a product launch', 'Product launch checklist for startups'] },
+  { id: 'async-guide', title: 'Answer async collaboration questions', impact: 'High impact', count: '1 query', description: 'Notion leads the sampled answers for async collaboration, while Acme appears in only 36%.', action: 'Create a practical guide to async teamwork with examples of handoffs, status updates, and decisions made in Acme.', queries: ['Best async collaboration tools'] },
+  { id: 'team-planning', title: 'Show how small teams plan', impact: 'Quick win', count: '1 query', description: 'Monday leads answers about affordable team planning. Acme appears in only 31% of sampled answers.', action: 'Add a small-team planning example to your features page, showing a weekly workflow and the plan needed to use it.', queries: ['Affordable team planning software'] },
 ]
 
 export function validateQueries(input: string, existing: string[], remaining: number): { queries: string[]; error: string } {
@@ -104,7 +115,7 @@ export function loadSavedQueries(): Query[] {
   try {
     const stored: unknown = JSON.parse(localStorage.getItem('lava-queries-v1') || '[]')
     if (!Array.isArray(stored)) return []
-    return stored.filter((q): q is Query => Boolean(q && typeof q === 'object' && typeof q.id === 'string' && typeof q.text === 'string' && Array.isArray(q.models) && q.models.every((m: unknown) => models.some(model => model.name === m)) && q.rate === null)).slice(0, 72)
+    return stored.filter((q): q is Query => Boolean(q && typeof q === 'object' && typeof q.id === 'string' && typeof q.text === 'string' && Array.isArray(q.models) && q.models.every((m: unknown) => appearanceModels.some(model => model.name === m)) && q.rate === null)).slice(0, 72)
   } catch { return [] }
 }
 

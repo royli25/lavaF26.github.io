@@ -9,6 +9,19 @@ test('overview matches the composition and chart range is interactive', async ({
   await expect(page.locator('.metric-card')).toHaveCount(4)
   await expect(page.locator('.zebra-months')).toContainText('Apr')
   await expect(page.locator('.zebra-months')).toContainText('Sep')
+  await expect(page.locator('.opportunity-list button, .opportunity-list a, .opportunity-list [tabindex]')).toHaveCount(0)
+  await page.locator('.opportunity-card').first().click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  const chart = page.getByRole('slider', { name: 'Inspect search appearances' })
+  await chart.click()
+  await expect(chart).toHaveCSS('outline-style', 'none')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Shift+Tab')
+  await expect(chart).toBeFocused()
+  await expect(chart).toHaveCSS('outline-style', 'solid')
+  await page.keyboard.press('ArrowLeft')
+  await expect(chart).toHaveAttribute('aria-valuenow', '181')
+  await chart.blur()
   await page.screenshot({ path: 'test-results/overview-desktop.png', fullPage: true })
   await page.getByRole('combobox', { name: 'Chart time range' }).click()
   await page.getByRole('option', { name: 'Last 3 months' }).click()
@@ -38,21 +51,20 @@ test('adding queries validates duplicates and persists across reloads', async ({
   await expect(dialog).not.toBeVisible()
 })
 
-test('opportunities open details and save to an action plan', async ({ page }) => {
-  await page.getByRole('button', { name: /Own the startup comparison/ }).click()
-  const dialog = page.getByRole('dialog')
-  await expect(dialog.getByRole('heading', { name: 'Recommended action' })).toBeVisible()
-  await dialog.getByRole('button', { name: 'Add to plan' }).click()
-  await expect(dialog.getByRole('button', { name: 'Remove from plan' })).toBeVisible()
-  await page.keyboard.press('Escape')
+test('opportunities show recommendations inside a locked preview', async ({ page }) => {
+  await page.getByRole('link', { name: 'Opportunities', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Coming soon', exact: true })).toBeVisible()
+  await expect(page.locator('.coming-soon-preview')).toHaveAttribute('inert', '')
+  await expect(page.locator('.opportunities-recommendation').first()).toContainText('Recommended action')
+  await expect(page.locator('.opportunities-ranking li')).toHaveCount(8)
+  await expect(page.getByRole('button', { name: 'Review opportunity' })).toHaveCount(0)
   await page.reload()
-  await page.getByRole('button', { name: /Own the startup comparison/ }).click()
-  await expect(page.getByRole('dialog').getByRole('button', { name: 'Remove from plan' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Coming soon', exact: true })).toBeVisible()
 })
 
 test('appearance opens its existing content from navigation and direct links', async ({ page }) => {
-  await page.getByRole('link', { name: 'Appearance', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Search appearances', exact: true })).toBeVisible()
+  await page.getByRole('link', { name: 'Performance', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Search performance', level: 2, exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Appearance by model', exact: true })).toBeVisible()
   await expect(page.getByRole('searchbox', { name: 'Search tracked queries' })).toBeVisible()
   await expect(page.locator('.coming-soon-stage')).toHaveCount(0)
@@ -113,8 +125,8 @@ test('sidebar stays compact while dashboard content scrolls', async ({ page }) =
   expect(await page.evaluate(() => window.scrollY)).toBe(0)
   await page.getByRole('button', { name: 'Collapse sidebar' }).click()
   await expect(page.getByRole('button', { name: 'Expand sidebar' })).toBeVisible()
-  await page.getByRole('link', { name: 'Appearance', exact: true }).click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Search appearance')
+  await page.getByRole('link', { name: 'Performance', exact: true }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Search performance')
 })
 
 test('dialog traps focus, restores it, and validates search model selection', async ({ page }) => {
@@ -122,7 +134,7 @@ test('dialog traps focus, restores it, and validates search model selection', as
   await trigger.click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Search queries', { exact: true }).fill('A new startup query')
-  for (const model of ['ChatGPT', 'Perplexity', 'Gemini', 'Claude']) await dialog.getByRole('checkbox', { name: model, exact: true }).uncheck()
+  await dialog.getByRole('checkbox', { name: 'All Models', exact: true }).uncheck()
   await dialog.getByRole('button', { name: 'Add queries', exact: true }).click()
   await expect(dialog.getByRole('alert')).toHaveText('Select at least one search model.')
   await page.keyboard.press('Tab')
@@ -133,7 +145,7 @@ test('dialog traps focus, restores it, and validates search model selection', as
 })
 
 test('appearance query selection synchronizes the chart and models', async ({ page }) => {
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   const search = page.getByRole('searchbox', { name: 'Search tracked queries' })
   await search.fill('startups')
   await page.locator('.query-results button').filter({ hasText: 'Best project management tool for startups' }).click()
@@ -159,7 +171,7 @@ test('appearance query selection synchronizes the chart and models', async ({ pa
 
 test('appearance saved queries have an honest no-data state', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('lava-queries-v1', JSON.stringify([{id:'new-demo-query', text:'A newly tracked query', models:['ChatGPT'], rate:null}])))
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   await page.reload()
   await page.getByRole('searchbox', { name:'Search tracked queries' }).fill('newly tracked')
   await page.locator('.query-results button').filter({hasText:'A newly tracked query'}).click()
@@ -169,7 +181,7 @@ test('appearance saved queries have an honest no-data state', async ({ page }) =
 
 test('appearance chart keeps its layout and styling across query selections', async ({ page }) => {
   await page.setViewportSize({ width: 1470, height: 920 })
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   await page.evaluate(() => document.fonts.ready)
   const panel = page.locator('.chart-panel')
   const chart = page.locator('.zebra-chart')
@@ -183,7 +195,14 @@ test('appearance chart keeps its layout and styling across query selections', as
     await expect(page.locator('.chart-summary strong')).toHaveText(/%$/)
     await expect(page.locator('.zebra-latest')).toHaveText(/%$/)
     await expect(page.locator('.zebra-art pattern')).toHaveCount(1)
-    await expect(page.locator('.zebra-art path[fill="none"]')).toHaveAttribute('stroke', '#8174ff')
+    await expect(page.locator('.zebra-art path[fill="none"]')).toHaveCount(2)
+    await expect(page.locator('.zebra-art path[fill="none"]').first()).toHaveAttribute('stroke', '#6571ef')
+    await expect(page.locator('.zebra-legend')).toContainText(name === 'Email marketing tools' ? 'Sigma Eta Pi' : 'SparkSC')
+    await page.getByRole('slider', { name: 'Inspect search appearances' }).focus()
+    await page.keyboard.press('Home')
+    await expect(page.locator('.zebra-interaction circle')).toHaveCount(2)
+    await expect(page.locator('.zebra-interaction')).toHaveAttribute('aria-valuetext', /Apr 1.*(SparkSC|Sigma Eta Pi)/)
+    await page.keyboard.press('Escape')
     await expect(page.locator('.zebra-interaction')).toContainText('100%')
   }
   await page.getByRole('button', { name: 'All queries', exact: true }).click()
@@ -194,7 +213,7 @@ test('appearance chart keeps its layout and styling across query selections', as
 
 test('appearance prompt mosaic fits three rows and synchronizes selection', async ({ page }) => {
   await page.setViewportSize({ width: 1470, height: 920 })
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   const pills = page.getByRole('group', { name: 'Query shortcuts' })
   await expect(pills.getByRole('button')).toHaveCount(11)
   await page.evaluate(() => document.fonts.ready)
@@ -219,7 +238,7 @@ test('appearance prompt mosaic fits three rows and synchronizes selection', asyn
 test('model panel scroll stays contained with readable endpoints', async ({ page }) => {
   await page.setViewportSize({ width: 1470, height: 640 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   const panel = page.locator('.full-height-models')
   const list = panel.locator('.model-list')
   await expect(list).toHaveAttribute('data-overflowing', 'true')
@@ -243,7 +262,7 @@ test('model panel scroll stays contained with readable endpoints', async ({ page
 })
 
 test('demo query colors agree with overall model trends in every reporting period', async ({ page }) => {
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   for (const days of [7, 28, 90]) {
     await page.getByRole('combobox', { name: 'Reporting period' }).click()
     await page.getByRole('option', { name: `Last ${days} days`, exact: true }).click()
@@ -261,7 +280,7 @@ test('demo query colors agree with overall model trends in every reporting perio
 })
 
 test('query search replaces chips above the input without moving the chart', async ({ page }) => {
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   const search = page.getByRole('searchbox', { name: 'Search tracked queries' })
   const chart = page.locator('.zebra-chart')
   const initialChart = await chart.boundingBox()
@@ -270,7 +289,7 @@ test('query search replaces chips above the input without moving the chart', asy
   await search.click()
   const results = page.getByRole('listbox', { name: 'Matching queries' })
   await expect.poll(() => results.boundingBox()).toEqual({ ...slot, y: slot!.y - 48, height: slot!.height + 48 })
-  await expect(page.getByRole('heading', { name: 'Search appearances', exact: true })).not.toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Search performance', level: 2, exact: true })).not.toBeVisible()
   expect(await chart.boundingBox()).toEqual(initialChart)
   expect(await page.locator('.query-picker').boundingBox()).toEqual(initialInput)
   await expect(page.getByRole('group', { name: 'Query shortcuts' })).not.toBeVisible()
@@ -297,7 +316,7 @@ test('query search replaces chips above the input without moving the chart', asy
 })
 
 test('every seeded demo query has complete model metrics and competitor data', async ({ page }) => {
-  await page.goto('/#Appearance')
+  await page.goto('/#Performance')
   await expect(page.locator('.competing-query strong')).toHaveCount(15)
   const names = await page.locator('.competing-query strong').allTextContents()
   expect(names.length).toBe(15)
@@ -312,5 +331,27 @@ test('every seeded demo query has complete model metrics and competitor data', a
     expect(metrics).toHaveLength(10)
     expect(metrics.every(value => value !== null && Number(value) >= 0 && Number(value) <= 100)).toBe(true)
     await expect(page.locator('.full-height-models .model-delta[aria-label="No data"]')).toHaveCount(0)
+  }
+})
+
+
+test('comparison shares total less than 100 percent throughout every query history', async ({ page }) => {
+  await page.goto('/#Performance')
+  const shortcuts = page.getByRole('group', { name: 'Query shortcuts' }).getByRole('button')
+  await expect(shortcuts).toHaveCount(11)
+  for (let index = 1; index < await shortcuts.count(); index++) {
+    await shortcuts.nth(index).click()
+    const lines = page.locator('.zebra-art path[fill="none"]')
+    await expect(lines).toHaveCount(2)
+    const histories = await lines.evaluateAll(paths => paths.map(path =>
+      [...path.getAttribute('d')!.matchAll(/[ML]([\d.]+),([\d.]+)/g)].map(point => (144 - Number(point[2])) / 122 * 100)
+    ))
+    expect(histories[0]).toHaveLength(183)
+    expect(histories[1]).toHaveLength(183)
+    for (let day = 0; day < 183; day++) {
+      expect(histories[0][day]).toBeGreaterThanOrEqual(0)
+      expect(histories[1][day]).toBeGreaterThanOrEqual(0)
+      expect(histories[0][day] + histories[1][day]).toBeLessThan(100)
+    }
   }
 })

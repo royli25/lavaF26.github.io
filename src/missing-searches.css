@@ -1,0 +1,24 @@
+/* Updated Figma card 192:58076; rows and actions share the attention card styles. */
+.insights-grid > .missing-searches-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 275px;
+  padding: 18px;
+  border: 1px solid #343434;
+  border-radius: 19px;
+  background: linear-gradient(#171717, #131313);
+}
+.overview-dashboard .missing-searches-panel::before {
+  background: url('/assets/missing-searches/feathered-grid.svg') top right / 100% 100% no-repeat;
+  mask-image: none;
+}
+.missing-searches-panel .panel-heading { min-height: 26px; margin-bottom: 14px; }
+.missing-searches-panel .panel-heading h2 { font-size: 14px; }
+.missing-searches-panel .panel-title-icon { width: 15px; height: 15px; }
+.missing-searches-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.missing-searches-list { margin-bottom: 12px; }
+.missing-searches-panel .missing-search-query { min-width: 0; font-size: 12px; font-weight: 400; line-height: 1.5; color: var(--text); }
+.missing-searches-panel .missing-search-row:first-child .missing-search-query { font-weight: 500; }
+@media (min-width: 768px) and (max-width: 1279px) {
+  .insights-grid > .campus-competitors { grid-column: 1 / -1; }
+}

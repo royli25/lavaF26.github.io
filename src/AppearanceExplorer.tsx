@@ -3,7 +3,7 @@ import { Search, X } from 'lucide-react'
 import { Panel, DashboardSelect } from './components'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
-import { appearanceModels as models, appearanceQueries, initialQueries, type Period, type Query } from './data'
+import { campusBrands, appearanceModels as models, appearanceQueries, initialQueries, type Period, type Query } from './data'
 import AppearanceChart from './AppearanceChart'
 import { ModelPanel } from './ModelPanel'
 import './appearance-explorer.css'
@@ -25,6 +25,24 @@ function observations(query: Query, modelIndex: number, days: number) {
     const ripple = Math.sin((182 - age) * .11 + seed + modelIndex) * .18
     return Math.round(Math.max(0, Math.min(100, query.rate! + modelOffset + trend + ripple)) * 10) / 10
   })
+}
+// Synthetic competitor history, matching the rest of this demo's query data.
+function competitorHistory(query: Query, brandValues: (number | null)[]) {
+  const seed = [...initialQueries, ...appearanceQueries].findIndex(q => q.id === query.id)
+  if (seed < 0 || query.rate === null || !query.losingTo) return undefined
+  const end = query.rate >= 68 ? 63 + seed % 7 * 3 : 58 + seed % 9 * 3
+  return {
+    name: query.losingTo,
+    logo: campusBrands.find(brand => brand.name === query.losingTo)!.logo,
+    values: brandValues.map((brandValue, day) => {
+      const progress = day / 182
+      // Allocate a portion of the remaining share to this competitor;
+      // the rest belongs to other brands. Round down to preserve that gap.
+      const remainingShare = Math.max(0, 100 - (brandValue ?? 0))
+      const competitorFraction = (end - (8 + seed % 5) * (1 - progress) + Math.sin(progress * Math.PI * 3) * 2) / 100
+      return Math.floor(remainingShare * competitorFraction * 10) / 10
+    }),
+  }
 }
 const average = (values: number[]) => values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length * 10) / 10 : null
 
@@ -71,6 +89,7 @@ export default function AppearanceExplorer({ queries: trackedQueries, period, in
   const series = scoped.flatMap(q => models.map((_, i) => observations(q, i, days))).filter(s => s.length)
   const overall = average(series.flat())
   const trendSeries = selected ? models.map((_, i) => observations(selected, i, 183)).filter(values => values.length) : []
+  const trendValues = Array.from({ length: 183 }, (_, day) => average(trendSeries.map(values => values[day])))
   const byModel = models.map((model, i) => {
     const values = scoped.flatMap(q => observations(q, i, days))
     const current = average(values)
@@ -130,8 +149,9 @@ export default function AppearanceExplorer({ queries: trackedQueries, period, in
         id: selected.id,
         label: selected.text,
         summary: overall,
+        competitor: competitorHistory(selected, trendValues),
         period,
-        values: Array.from({ length: 183 }, (_, day) => average(trendSeries.map(values => values[day]))),
+        values: trendValues,
         change: average(byModel.map(m => m.change).filter((v): v is number => v !== null)),
       } : undefined} />
       <ModelPanel onSelect={setModelFilter} items={selected ? byModel : models.map(m => ({ ...m, change: Number(m.change) }))} reorderable />
@@ -145,7 +165,7 @@ export default function AppearanceExplorer({ queries: trackedQueries, period, in
           <span className="competing-query"><strong>{query.text}</strong><small>{query.models.join(' · ')}</small></span>
           <span className="competing-rate"><strong>{rate === null ? 'No data yet' : `${rate}%`}</strong>{rate !== null && <span className="competing-rate-track" aria-hidden="true"><i style={{width:`${rate}%`}}/></span>}</span>
           <span className="competing-weakest">{weakest && <img src={`${import.meta.env.BASE_URL}assets/logos/${weakest.toLowerCase()}.svg`} className={weakest === 'ChatGPT' ? 'logo-monochrome' : undefined} alt="" width="16" height="16" />}{weakest ?? 'Awaiting data'}</span>
-          <span className="competing-competitor">{losingTo && <img src={`${import.meta.env.BASE_URL}assets/logos/${losingTo.toLowerCase()}.svg`} className={losingTo === 'Monday' ? undefined : 'logo-monochrome'} alt="" width="16" height="16" />}{losingTo ?? '—'}</span>
+          <span className="competing-competitor">{losingTo && <img src={`${import.meta.env.BASE_URL}assets/competitors/${campusBrands.find(brand => brand.name === losingTo)?.logo}.png`} alt="" width="16" height="16" />}{losingTo ?? '—'}</span>
         </button>
       })}
       {!ranked.length && <p className="explorer-no-data">No tracked queries for this model.</p>}</div>
