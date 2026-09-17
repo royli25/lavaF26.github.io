@@ -50,7 +50,7 @@ export function ModelPanel({ onSelect, items = defaultItems, reorderable = false
       const declining = (model.change ?? 0) < 0
       const Arrow = declining ? ArrowDownRight : ArrowUpRight
       return <Button variant="ghost" className="app-button model-row" key={model.name} onClick={() => onSelect(model.name)} aria-label={`View queries appearing in ${model.name}`}>
-        <span className="model-name"><img className={`model-logo ${model.name === 'ChatGPT' ? 'logo-monochrome' : ''}`} src={`/assets/logos/${model.name.toLowerCase()}.svg`} alt="" width="18" height="18" />{model.name}</span>
+        <span className="model-name"><img className={`model-logo ${model.name === 'ChatGPT' ? 'logo-monochrome' : ''}`} src={`${import.meta.env.BASE_URL}assets/logos/${model.name.toLowerCase()}.svg`} alt="" width="18" height="18" />{model.name}</span>
         <span className="model-meter-score">
           <span className={`model-segments${declining ? ' is-declining' : ''}`} role="meter" aria-label={`${model.name} appearance rate`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={model.rate ?? undefined} aria-valuetext={model.rate === null ? 'No data' : `${model.rate}%`}>
             {Array.from({ length: 20 }, (_, i) => <span key={i} data-filled={model.rate !== null && i < Math.round(model.rate / 5) ? '' : undefined} />)}

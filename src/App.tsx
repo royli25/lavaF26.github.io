@@ -35,7 +35,7 @@ function AppearanceChart() {
 
 
 function CompetitorMark({ name }: { name: string }) {
-  return <span className={`competitor-mark ${name === 'Acme' ? 'own-brand' : ''}`}>{name === 'Acme' ? <Icon name="imgIconSpark3" /> : <img className={`competitor-logo ${name !== 'Monday' ? 'logo-monochrome' : ''}`} src={`/assets/logos/${name.toLowerCase()}.svg`} alt="" width="19" height="19" />}</span>
+  return <span className={`competitor-mark ${name === 'Acme' ? 'own-brand' : ''}`}>{name === 'Acme' ? <Icon name="imgIconSpark3" /> : <img className={`competitor-logo ${name !== 'Monday' ? 'logo-monochrome' : ''}`} src={`${import.meta.env.BASE_URL}assets/logos/${name.toLowerCase()}.svg`} alt="" width="19" height="19" />}</span>
 }
 
 function App() {
@@ -107,7 +107,7 @@ function App() {
     { label: 'Search appearances', value: metric.appearances, change: metric.deltas[1] },
     { label: 'Share of voice', value: metric.share, change: metric.deltas[2] },
     { label: 'Queries to improve', value: metric.opportunities, change: '6 high-impact opportunities', warm: true },
-  ].map(item => <Card className="metric-card" key={item.label}><span className="metric-label">{item.label}</span><div className="metric-value"><strong>{item.value}</strong><img src={`/assets/${item.warm ? 'imgTrend1' : 'imgTrend'}.svg`} width="70" height="28" alt="" /></div><div className={`metric-change ${item.warm ? 'warm-text' : ''}`}>{!item.warm && <span aria-hidden="true">↗ </span>}{item.change}{!item.warm && <span> vs. previous period</span>}</div></Card>)}</div>
+  ].map(item => <Card className="metric-card" key={item.label}><span className="metric-label">{item.label}</span><div className="metric-value"><strong>{item.value}</strong><img src={`${import.meta.env.BASE_URL}assets/${item.warm ? 'imgTrend1' : 'imgTrend'}.svg`} width="70" height="28" alt="" /></div><div className={`metric-change ${item.warm ? 'warm-text' : ''}`}>{!item.warm && <span aria-hidden="true">↗ </span>}{item.change}{!item.warm && <span> vs. previous period</span>}</div></Card>)}</div>
 
   const queryTable = <Panel title="Tracked queries" className="query-panel" action={<Button variant="ghost" className="app-button text-button" onClick={openQueries}>Add queries <span aria-hidden="true">+</span></Button>}>
     <div className="table-toolbar"><Input type="search" aria-label="Search tracked queries" placeholder="Find a query" value={search} onChange={e => setSearch(e.target.value)} /><DashboardSelect label="Filter queries by model" value={modelFilter} onValueChange={setModelFilter} options={["All models", ...models.map(m => m.name)]} /></div>

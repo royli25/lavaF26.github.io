@@ -144,8 +144,8 @@ export default function AppearanceExplorer({ queries: trackedQueries, period, in
         return <button className={`competing-row ${selectedId === query.id ? 'is-selected' : ''}`} key={query.id} aria-pressed={selectedId === query.id} onClick={() => choose(query.id, true)}>
           <span className="competing-query"><strong>{query.text}</strong><small>{query.models.join(' · ')}</small></span>
           <span className="competing-rate"><strong>{rate === null ? 'No data yet' : `${rate}%`}</strong>{rate !== null && <span className="competing-rate-track" aria-hidden="true"><i style={{width:`${rate}%`}}/></span>}</span>
-          <span className="competing-weakest">{weakest && <img src={`/assets/logos/${weakest.toLowerCase()}.svg`} className={weakest === 'ChatGPT' ? 'logo-monochrome' : undefined} alt="" width="16" height="16" />}{weakest ?? 'Awaiting data'}</span>
-          <span className="competing-competitor">{losingTo && <img src={`/assets/logos/${losingTo.toLowerCase()}.svg`} className={losingTo === 'Monday' ? undefined : 'logo-monochrome'} alt="" width="16" height="16" />}{losingTo ?? '—'}</span>
+          <span className="competing-weakest">{weakest && <img src={`${import.meta.env.BASE_URL}assets/logos/${weakest.toLowerCase()}.svg`} className={weakest === 'ChatGPT' ? 'logo-monochrome' : undefined} alt="" width="16" height="16" />}{weakest ?? 'Awaiting data'}</span>
+          <span className="competing-competitor">{losingTo && <img src={`${import.meta.env.BASE_URL}assets/logos/${losingTo.toLowerCase()}.svg`} className={losingTo === 'Monday' ? undefined : 'logo-monochrome'} alt="" width="16" height="16" />}{losingTo ?? '—'}</span>
         </button>
       })}
       {!ranked.length && <p className="explorer-no-data">No tracked queries for this model.</p>}</div>

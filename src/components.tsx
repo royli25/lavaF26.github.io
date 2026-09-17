@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle } from './components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
 
 export function Icon({ name, className = '' }: { name: string; className?: string }) {
-  return <img className={`icon ${className}`} src={`/assets/${name}.svg`} alt="" width="18" height="18" draggable="false" />
+  return <img className={`icon ${className}`} src={`${import.meta.env.BASE_URL}assets/${name}.svg`} alt="" width="18" height="18" draggable="false" />
 }
 
 type PanelTitleIcon = 'soft-search' | 'soft-layers' | 'focus-pebble' | 'friendly-rivals' | 'live-pulse'
